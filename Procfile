@@ -1,1 +1,1 @@
-web: python server.py
+web: PORT=80 python server.py
