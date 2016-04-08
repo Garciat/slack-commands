@@ -4,7 +4,10 @@ app = Flask(__name__)
 
 @app.route('/python', methods=['POST'])
 def python_command():
-    return str(eval(request.form['text']))
+    try:
+        return str(eval(request.form['text']))
+    except:
+        return 'Your snippet failed ):'
 
 if __name__ == '__main__':
     host = os.environ.get('IP', '0.0.0.0')
