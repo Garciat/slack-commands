@@ -1,14 +1,13 @@
+import os
 from flask import Flask, request
-from flask_slack import Slack
-
 app = Flask(__name__)
 
-slack = Slack(app)
-
-@slack.command('python', token='UfzxmsQwTovzkgJnC4lk9KFj', methods=['POST'])
-def python_command(**kwargs):
-    text = kwargs.get('text')
-    return slack.response(eval(text))
+@app.route('/python', methods=['POST'])
+def python_command():
+    return str(eval(request.form['text']))
 
 if __name__ == '__main__':
-    app.run()
+    host = os.environ.get('IP', '127.0.0.1')
+    port = os.environ.get('PORT', 5000)
+    
+    app.run(host=host, port=int(port), debug=True)
