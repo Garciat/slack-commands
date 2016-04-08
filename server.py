@@ -7,7 +7,7 @@ def python_command():
     return str(eval(request.form['text']))
 
 if __name__ == '__main__':
-    host = os.environ.get('IP', '127.0.0.1')
+    host = os.environ.get('IP', '0.0.0.0')
     port = os.environ.get('PORT', 5000)
     
     app.run(host=host, port=int(port), debug=__debug__)
