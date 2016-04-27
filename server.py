@@ -38,8 +38,8 @@ def dis_expression(src):
 
 
 code_handlers = [
-    ('@', dis_expression),
     ('@!', dis_statement),
+    ('@', dis_expression),
     ('!', run_statement),
     ('', run_expression),  # default. last because empty prefix
 ]
