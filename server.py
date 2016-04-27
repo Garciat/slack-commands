@@ -59,6 +59,7 @@ def python_command():
             if src.startswith(prefix):
                 src_clean = src[len(prefix):]
                 output = handler(src_clean)
+                break
 
         return str(output)
     except:
