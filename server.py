@@ -1,5 +1,6 @@
 import io
 import os
+import dis
 import sys
 import threading
 import traceback
@@ -9,27 +10,6 @@ from contextlib import contextmanager
 from flask import Flask, request
 
 app = Flask(__name__)
-
-@app.route('/python', methods=['POST'])
-def python_command():
-    src = request.form['text']
-    
-    if not src:
-        return 'Empty snippet ):'
-    
-    is_statement = src.startswith('!')
-    
-    try:
-        output = None
-        if is_statement:
-            src = src[1:]
-            output = run_statement(src)
-        else:
-            output = run_expression(src)
-        return str(output)
-    except:
-        traceback.print_exc()
-        return 'Your snippet failed ):'
 
 
 statement_lock = threading.Lock()
@@ -43,6 +23,47 @@ def run_statement(src):
 
 def run_expression(src):
     return eval(src)
+
+
+def dis_statement(src):
+    with statement_lock, io.BytesIO() as out_buffer, redirect_stdout(out_buffer):
+        dis.dis(compile(src, '<slack>', 'exec'))
+        return out_buffer.getvalue()
+
+
+def dis_expression(src):
+    with statement_lock, io.BytesIO() as out_buffer, redirect_stdout(out_buffer):
+        dis.dis(compile(src, '<slack>', 'exec'))
+        return out_buffer.getvalue()
+
+
+code_handlers = [
+    ('@', dis_expression),
+    ('@!', dis_statement),
+    ('!', run_statement),
+    ('', run_expression),  # default. last because empty prefix
+]
+
+
+@app.route('/python', methods=['POST'])
+def python_command():
+    src = request.form['text']
+    
+    if not src:
+        return 'Empty snippet ):'
+    
+    try:
+        output = None
+
+        for prefix, handler in code_handlers:
+            if src.startswith(prefix):
+                src_clean = src[len(prefix):]
+                output = handler(src_clean)
+
+        return str(output)
+    except:
+        traceback.print_exc()
+        return 'Your snippet failed ):'
 
 
 @contextmanager
