@@ -33,7 +33,7 @@ def dis_statement(src):
 
 def dis_expression(src):
     with statement_lock, io.BytesIO() as out_buffer, redirect_stdout(out_buffer):
-        dis.dis(compile(src, '<slack>', 'exec'))
+        dis.dis(compile(src, '<slack>', 'eval'))
         return out_buffer.getvalue()
 
 
