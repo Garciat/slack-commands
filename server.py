@@ -61,7 +61,7 @@ def python_command():
                 output = handler(src_clean)
                 break
 
-        return str(output)
+        return "```{}```".format(output)
     except:
         traceback.print_exc()
         return 'Your snippet failed ):'
